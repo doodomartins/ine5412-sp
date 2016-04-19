@@ -10,8 +10,8 @@
 
 
 // Agrupamento 07
-// nome do aluno:
-// nome do aluno:
+// nome do aluno: Douglas Marcelino Beppler Martins 13104674
+// nome do aluno: Maike de Paula Santos 13100763
 // nome do aluno: Ruan Ramon de Olveira 13200672
 
 
@@ -24,7 +24,7 @@ typedef struct{
 using namespace std;
 
 //LINHA E COLUNA CERTAS
-int table[SIZE][SIZE] = {{1,2,3,4,5,6,7,8,9},
+int table[SIZE][SIZE] = {{1,2,3,4,4,6,7,8,9},
 						 {2,3,4,5,6,7,8,9,1},
 						 {3,4,5,6,7,8,9,1,2},
 						 {4,5,6,7,8,9,1,2,3},
@@ -34,39 +34,140 @@ int table[SIZE][SIZE] = {{1,2,3,4,5,6,7,8,9},
 						 {8,9,1,2,3,4,5,6,7},
 						 {9,1,2,3,4,5,6,7,8}};
 
-void verifyRow(){
-	// parameters* param =  (parameters*) p;
-	bool valid = true;
+void* verifyRow(void* a){
+	int *valid = (int*) a;
 	int line[SIZE];
-	copy(table[4], table[4] + SIZE, line);
-	sort(line, line + SIZE);
-	
- 	for(int i = 0; i < SIZE; i++){
- 		if(line[i] != i +1){
- 			valid = false;
- 		}
+
+	for(int i = 0; i < SIZE; i++){
+		//Copy line
+		copy(table[i], table[i] + SIZE, line);
+		for (int k = 0; k < SIZE; ++k){
+			cout << line[k] << " ";
+		}
+		
+		sort(line, line + SIZE);
+		
+	 	for(int j = 0; j < SIZE; j++){
+	 		if(line[j] != j+1){
+	 			*valid = 0;
+	 			return (void*) valid;
+	 		}
+		}
+		if(*valid == 1){
+			cout << "Line " << i << " is valid\n";
+		}
 	}
 	//TODO ver o que faço aqui, retorno false?
 }
 
-void verifyColumn(){
-	// parameters* param =  (parameters*) p;
-	bool valid = true;
-	int line[SIZE];
-	copy(table[4], table[4] + SIZE, line);
-	sort(line, line + SIZE);
-	
- 	for(int i = 0; i < SIZE; i++){
- 		if(line[i] != i +1){
- 			valid = false;
- 		}
+void* verifyColumn(void* a){
+	int *valid = (int*) a;
+	int column[SIZE];
+
+	for(int j = 0; j < SIZE; j++){
+		//Copy column
+		for(int i = 0; i < SIZE; i++){
+			column[i] = table[j][i];
+		}
+		for (int k = 0; k < SIZE; ++k){
+			cout << column[k] << "\n";
+		}
+
+		sort(column, column + SIZE);
+		
+	 	for(int i = 0; i < SIZE; i++){
+	 		if(column[i] != i +1){
+	 			*valid = 0;
+	 			return (void*) valid;
+	 		}
+		}
+
+		if(*valid == 1){
+			cout << "Col " << j << " is valid\n";
+		}
 	}
+	//TODO delete p
 	//TODO ver o que faço aqui, retorno false?
 }
+
+void* verifyBlock(void* a){
+	parameters* p = (parameters*) a;
+
+	int valid = 1;
+	//block Size
+	int blockSize = 3;
+	int block[SIZE];
+
+	int line = p->row;
+	int col = p->column;
+
+	for(int i = 0; i < blockSize; i++){
+		copy(table[line+i] + col, table[line+i] + col + blockSize, block + blockSize*i);
+	}
+
+	for (int i = 0; i < SIZE; i++){
+		if(i%3 == 0){
+			cout << "\n";
+		}
+		cout << block[i] << " ";
+	}	
+	
+
+	sort(block, block + SIZE);
+		
+	for(int i = 0; i < SIZE; i++){
+		if(block[i] != i +1){
+			valid = 0;
+			// return (void*) &valid;
+		}
+	}
+
+
+	free(a);
+	cout<<"\n";
+
+}
+
 
 
 int main(){
-	verifyRow();
+	int isRowValid = 1;
+	int isColValid = 1;
+	int isBlockValid[SIZE];
+
+	int threadLineResult;
+
+	// pthread_t threadsBlock[SIZE];
+
+	pthread_t threadLine, threadCol;
+    pthread_create(&threadLine, NULL, &verifyRow, &isRowValid);
+ 	// pthread_create(&threadCol, NULL, &verifyColumn, &isColValid);
+
+ 	//TODO como pegar o retorno? 
+ 	pthread_join(threadLine, NULL);
+	// pthread_join(threadCol, NULL);
+
+	// int count = 0;
+	// for (int i = 0; i < 3; i++){
+	// 	for (int j = 0; j < 3; j++) {
+			
+	// 		parameters *data = (parameters *) malloc(sizeof(parameters));
+	// 		data->row = i*3;
+	// 		data->column = j*3;
+
+	// 		pthread_create(&threadsBlock[count], NULL, &verifyBlock, data);
+	// 		cout<<"\n\n";
+	// 		count++;
+	// 	}
+
+
+	// }
+    
+ //    for(int i = 0; i < SIZE; i++){
+
+ // 		//TODO como pegar o retorno? 
+	// 	pthread_join(threadsBlock[i], NULL);
+	// }
 }
 
 // int maina() {
